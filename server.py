@@ -77,7 +77,7 @@ except Exception as e:
 # -----------------------------------------------------------------------------
 # 3. Initialize FastMCP, register tool
 # -----------------------------------------------------------------------------
-mcp = FastMCP("negativeAptReviews")
+mcp = FastMCP("MCP Server Discovery")
 
 # compiling the api key pattern for fetch_readme.md only once here:
 API_KEY_PATTERN_RE = re.compile(
@@ -448,20 +448,20 @@ def fetch_readme(github_url: str) -> str:
 # 4. Run as a stdio MCP server
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
-    # # ---- Streamable HTTP server BLOCK ----
-    # asyncio.run(
-    #     mcp.run_async(
-    #         transport="streamable-http",
-    #         host="0.0.0.0",
-    #         port=os.getenv("PORT", 55000)
-    #     )
-    # )
-    # # ---- END Streamable HTTP server BLOCK ----
-
-    # ---- Standard I/O server BLOCK ----
+    # ---- Streamable HTTP server BLOCK ----
     asyncio.run(
         mcp.run_async(
-            transport="stdio",
+            transport="streamable-http",
+            host="0.0.0.0",
+            port=os.getenv("PORT", 8080)
         )
     )
-    # ---- END Standard I/O server BLOCK ----
+    # ---- END Streamable HTTP server BLOCK ----
+
+    # # ---- Standard I/O server BLOCK ----
+    # asyncio.run(
+    #     mcp.run_async(
+    #         transport="stdio",
+    #     )
+    # )
+    # # ---- END Standard I/O server BLOCK ----
