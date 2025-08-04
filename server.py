@@ -77,7 +77,7 @@ except Exception as e:
 # -----------------------------------------------------------------------------
 # 3. Initialize FastMCP, register tool
 # -----------------------------------------------------------------------------
-mcp = FastMCP("negativeAptReviews")
+mcp = FastMCP("MCP Server Discovery")
 
 # compiling the api key pattern for fetch_readme.md only once here:
 API_KEY_PATTERN_RE = re.compile(
