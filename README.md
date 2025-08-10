@@ -1,8 +1,11 @@
 # 1 MCP Server: A MCP server that picks and configures MCP servers for you
+> MCP of MCPs. Automatic discovery and configure MCP servers on your local machine. Remote! 
 
 We aim at providing only this MCP server. Then you can leave all the rest (searching servers, selecting servers, configuring servers, etc) all to this MCP server.
 
 No need to run setup commands, no need to acquire api keys. Just need to modify one file.
+
+
 
 ### Demo video: https://youtu.be/Kv2HgD9hRZ8 
 # Set up Instruction
@@ -22,7 +25,7 @@ Add the following to curson or claude MCP config file.
 {
   "mcpServers": {
     "mcp-server-discovery": {
-      "url": "http://fastmcp.pfvc.io/mcp",
+      "url": "https://mcp.1mcpserver.com/mcp/",
       "headers": {
         "Accept": "text/event-stream",
         "Cache-Control": "no-cache",
@@ -37,7 +40,7 @@ If you are already using other servers, the json file should look like this
 {
     "mcpServers": {
         "mcp-server-discovery": {
-            "url": "http://fastmcp.pfvc.io/mcp",
+            "url": "https://mcp.1mcpserver.com/mcp/",
             "headers": {
                 "Accept": "text/event-stream",
                 "Cache-Control": "no-cache",
@@ -81,7 +84,8 @@ The mcp.json should look like this:
                 "--directory",
                 "{PATH_TO_THE_CLONED_REPO}",
                 "run",
-                "server.py"
+                "server.py", 
+               "--local"
             ]
         },
         "file-system": {
@@ -129,11 +133,17 @@ There are multiple stages in the deep search:
 - Better database for MCP servers. It should be in structure: server, description, url, config json, (optionally, additional setup, docker, api_key, etc)
 
 
-This repo is based on these repos. Huge thanks to the author and contributors of these repos. 
+### This repo is based on these repos. Huge thanks to the author and contributors of these repos.
+Data source: 
 - wong2/awesome-mcp-servers
 - metorial/mcp-containers
 - punkpeye/awesome-mcp-servers
+- modelcontextprotocol/servers
 
+Published to: 
+- https://mcpservers.org/
+- https://glama.ai/mcp/servers
+- 
 
 
 
