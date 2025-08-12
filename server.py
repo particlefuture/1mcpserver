@@ -105,7 +105,7 @@ def deep_search_planning():
     break it into smaller components/steps, find corresponding MCP servers for each component,
     and then set up the servers. IF AN API KEY IS REQUIRED, YOU MUST INSTRUCT THE USER TO GET THE API KEY.
     """
-    return f"""Execute the following steps to fulfill a complex, high-level goal. IF AN API KEY IS REQUIRED, YOU MUST INSTRUCT THE USER TO GET THE API KEY:
+    return f"""Execute the following steps to fulfill a complex, high-level goal. IF AN API KEY IS REQUIRED, YOU MUST PROVIDE INSTRUCTIONS TO THE USERS TO GET THE API KEY:
 
 1. **Decompose the Goal if Necessary**
    - Call the `quick_search` tool to find MCP servers that match the user’s goal.
@@ -125,7 +125,7 @@ def deep_search_planning():
       - Call the `fetch_readme` tool to retrieve its README. REMEMBER to ask the user to configure credentials if the readme requires an API key.  
    b. **Configure Credentials**  
       - Scan the README for API-key or credential requirements.  
-      - Provide the user with instructions to obtain any missing keys.  
+      - If there is an API KEY, Immediately provide the user with instructions to obtain any missing keys.  
       - Store configured keys in the environment or secrets file.  
    c. **Prepare MCP Config**  
       1. Invoke `configure_mcp_plan()` to generate the local plan for updating `mcp.json`.  
@@ -309,6 +309,36 @@ def _parse_github_url(url: str) -> Optional[Tuple[str, str, Optional[str], Optio
             subpath = "/".join(parts[2:])
     return owner, repo, branch, subpath
 
+
+@mcp.tool()
+def file_system_config_setup():
+    """
+    This tool is for configuring the MCP server via filesystem.
+    It will ask the user to provide the MCP config file path and the content to write.
+    """
+    return """If the file_system mcp server is not installed yet, update the MCP config file with the following content: 
+```json
+{
+    "mcpServers": {
+        "mcp-server-discovery": {
+            "url": "https://mcp.1mcpserver.com/mcp/",
+            "headers": {
+                "Accept": "text/event-stream",
+                "Cache-Control": "no-cache",
+            }
+        },
+        "file-system": {
+            "command": "node",
+            "args": [
+                "/Users/jiazhenghao/CodingProjects/MCP/filesystem/index.ts",
+                "~/"
+            ]
+        }
+    }
+}
+```
+"""
+
 @mcp.tool(name="fetch_readme")
 def fetch_readme(github_url: str) -> str:
     """
@@ -431,7 +461,7 @@ def fetch_readme(github_url: str) -> str:
         }
 
         if require_api_key:
-            result["REMINDER"] = "INSTRUCT THE USER TO GET THE API KEY"
+            result["REMINDER"] = "IMMEDIATELY INSTRUCT THE USER TO GET THE API KEY. PROVIDE THEM WITH THE URL IF POSSIBLE."
 
     except Exception as e:
         result = {
@@ -448,20 +478,29 @@ def fetch_readme(github_url: str) -> str:
 # 4. Run as a stdio MCP server
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
-    # ---- Streamable HTTP server BLOCK ----
-    asyncio.run(
-        mcp.run_async(
-            transport="streamable-http",
-            host="0.0.0.0",
-            port=os.getenv("PORT", 8080)
-        )
-    )
-    # ---- END Streamable HTTP server BLOCK ----
+    import argparse
 
-    # # ---- Standard I/O server BLOCK ----
-    # asyncio.run(
-    #     mcp.run_async(
-    #         transport="stdio",
-    #     )
-    # )
-    # # ---- END Standard I/O server BLOCK ----
+    parser = argparse.ArgumentParser(description="Run MCP Server Discovery")
+    parser.add_argument(
+        "--local",
+        action="store_true",
+        help="Run server locally via stdio instead of HTTP",
+    )
+    args = parser.parse_args()
+
+    if args.local:
+        # ---- Standard I/O server BLOCK ----
+        asyncio.run(
+            mcp.run_async(
+                transport="stdio",
+            )
+        )
+    else:
+        # ---- Streamable HTTP server BLOCK ----
+        asyncio.run(
+            mcp.run_async(
+                transport="streamable-http",
+                host="0.0.0.0",
+                port=int(os.getenv("PORT", 8080)),
+            )
+        )
