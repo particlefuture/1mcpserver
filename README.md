@@ -43,8 +43,7 @@ If you are already using other servers, the json file should look like this
             "url": "https://mcp.1mcpserver.com/mcp/",
             "headers": {
                 "Accept": "text/event-stream",
-                "Cache-Control": "no-cache",
-                "API_KEY": "value"
+                "Cache-Control": "no-cache"
             }
         },
         "file-system": {
@@ -144,6 +143,14 @@ Published to:
 - https://mcpservers.org/
 - https://glama.ai/mcp/servers
 - 
+
+### More about the repo
+Motivation and Context: 
+> Right now, most MCP server search are done via github searching or online google search. There has been several MCP wrappers, but most serves as an middleware infrastructure that hosts different MCP at an endpoint. The gathering of which MCP to host is still mostly done by manual search. We provide an automatic pipeline of not only searching but also automatically configuring MCP servers.
+
+How Has This Been Tested?
+> Tested with Claude and Cursor with both remote endpoint and local stdio. Tested the demo for 10 times. 
+
 
 
 
