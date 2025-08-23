@@ -1,5 +1,5 @@
 # QuickStart Demo
-
+Video tutorial: [https://youtu.be/W4EAmaTTb2A](https://youtu.be/W4EAmaTTb2A)
 ### Here, we show a demo of how to use the MCP server with Cursor or Claude to analyze websites. 
 
 ### 0. Setup 1MCPServer
@@ -33,6 +33,8 @@ Now restart you cursor/claude.
 
 # Detailed YouTube Video Walkthrough: 
 Title: Building ANYTHING you want with vibe coding + MCP servers in 5 minutes (pure beginners)
+
+Let's learn to use MCP servers to do anything you want with LLMs in 5 minutes. 
 ## What is MCP? 
 Something we can use that makes the LLMs really powerful. 
 
@@ -74,12 +76,12 @@ The next step to do is to spin up cursor to add our first MCP server. In this ex
 Now we can see there are 2 MCPs being added. Toggle them. If you see green, great! If you see anything else, lmk in the comments and I'll try to help. 
 
 ## Finding and adding MCP servers
-I want to perform analysis of websites. tech stack, web data
+Now in this demo, we are going to show how we can make LLMs an expertise in web analysis. Let's tell cursor to do so. To achieve so, we let the LLMs find and add more MCP servers itself. But this time, the LLM does all the searching and configurations instead of us. 
 
 I want to perform analysis of website. I want to be able to analyze the tech stack the website uses, and extract web data. Call the deep_search tool.
 
 - we see it starts planning
-- start finding a bunch of relevant MCP servers
+- start finding a bunch of relevant MCP servers. (GPT5 likes to do a lot of searches)
 - selects the most relevant and fetches their README for setup instructions
 - start configuring the MCP servers
     - let's go grab the API keys
