@@ -7,7 +7,7 @@ No need to run setup commands, no need to acquire api keys. Just need to modify 
 
 
 
-### Demo video: https://youtu.be/Kv2HgD9hRZ8 
+### Demo video: https://youtu.be/W4EAmaTTb2A 
 # Set up Instruction
 
 ### Simple remote setup: integration with Cursor and Claude (Option 1) 
