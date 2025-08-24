@@ -1,10 +1,17 @@
+from pathlib import Path
+
 import asyncio
 import json
 import os
 import re
 from typing import List, Literal, Any
 from typing import Tuple, Optional
+import os
+from pathlib import Path
 
+from fastmcp import FastMCP
+from fastapi.responses import FileResponse, PlainTextResponse
+from starlette.requests import Request
 import requests
 from fastapi import HTTPException
 from fastmcp import FastMCP
@@ -15,6 +22,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
 from scrape import INDEX_DIR, DB_PATH, HEADER
+
+DOCS_DIR = Path(__file__).parent / "docs"
 
 # If openai api key not present, run load_dotenv
 if not os.environ.get("OPENAI_API_KEY"):
@@ -85,6 +94,52 @@ API_KEY_PATTERN_RE = re.compile(
     re.IGNORECASE
 )
 
+# -----------------------------------------------------------------------------
+# LANDING PAGE
+# -----------------------------------------------------------------------------
+
+def _file_or_404(p: Path):
+    if p.is_file():
+        # Add a tiny bit of caching for static assets
+        headers = {}
+        if any(part == "_next" for part in p.parts):
+            headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return FileResponse(p, headers=headers)
+    return PlainTextResponse("Not Found", status_code=404)
+
+
+@mcp.custom_route("/", methods=["GET"])
+async def serve_root(_: Request):
+    return _file_or_404(DOCS_DIR / "index.html")
+
+@mcp.custom_route("/_next/{rest:path}", methods=["GET"])
+async def serve_next(request: Request):
+    if request is not None:
+        req = request.base_url
+        print(f"Got _next request: {req} requesting for url {request.url}")
+    rest = request.path_params.get("rest", "")
+    print(request.path_params)
+    print(f"Serving _next file: {rest}")
+    return _file_or_404(DOCS_DIR / f"_next/{rest}")
+
+
+# Serve any other file that lives under docs/ (images, css, js, favicon, etc.)
+# e.g. /assets/logo.png, /robots.txt, /sitemap.xml, /favicon.ico
+@mcp.custom_route("/{rest:path}", methods=["GET"])
+async def serve_any(request: Request):
+    # Try exact file first
+    rest = request.path_params.get("rest", "")
+    file_resp = _file_or_404(DOCS_DIR / rest)
+    if file_resp.status_code == 200:
+        return file_resp
+    # Optional SPA-style fallback: if you want unknown paths to render index.html
+    # (useful if you have client-side routing)
+    # return _file_or_404(_safe_path("index.html"))
+    return file_resp
+# -----------------------------------------------------------------------------
+# END OF LANDING PAGE
+# -----------------------------------------------------------------------------
+
 def vector_store_search(query: str, top_k: int = 20) -> List[Document]:
     """
     Perform a similarity search over the vector store.
@@ -95,7 +150,6 @@ def vector_store_search(query: str, top_k: int = 20) -> List[Document]:
         return matches
     except Exception as e:
         return []
-
 
 
 @mcp.tool()
@@ -138,7 +192,6 @@ def deep_search_planning():
    - Once all servers are configured, summarize the completed setup steps and next actions for the user."""
 
 
-
 @mcp.tool()
 def configure_mcp_plan():
     """
@@ -155,10 +208,10 @@ def configure_mcp_plan():
 
 
 @mcp.tool(name="find_mcp_config_path_path",
-        description=(
-            "Determine what the MCP config path is based on users application and operating system. Before calling this tool, you must call `configure_mcp_plan`. "
-        ))
-def find_mcp_config_path(application: Literal['Cursor', 'Claude'], os: Literal["Mac", "Windows"]= "Mac") -> str:
+          description=(
+                  "Determine what the MCP config path is based on users application and operating system. Before calling this tool, you must call `configure_mcp_plan`. "
+          ))
+def find_mcp_config_path(application: Literal['Cursor', 'Claude'], os: Literal["Mac", "Windows"] = "Mac") -> str:
     config_path = ""
     if application == 'Cursor':
         config_path = "./.cursor/mcp.json"
@@ -166,7 +219,7 @@ def find_mcp_config_path(application: Literal['Cursor', 'Claude'], os: Literal["
         if os == "Mac":
             config_path = "~/Library/Application Support/Claude/claude_desktop_config.json"
         elif os == "Windows":
-            config_path = "%APPDATA%\Claude\claude_desktop_config.json"
+            config_path = r"%APPDATA%\Claude\claude_desktop_config.json"
         else:
             config_path = "Sorry, Linux is not supported. Ask Linus Torvalds to add support for it."
     else:
@@ -244,8 +297,6 @@ def validate_mcp_config(mcp_config_content: str) -> bool:
     return True
 
 
-
-
 @mcp.tool()
 def quick_search(query: str,
                  top_k: int = 100) -> list[str]:
@@ -273,6 +324,7 @@ def quick_search(query: str,
         })
 
     return results
+
 
 def _parse_github_url(url: str) -> Optional[Tuple[str, str, Optional[str], Optional[str]]]:
     """
@@ -338,6 +390,7 @@ def file_system_config_setup():
 }
 ```
 """
+
 
 @mcp.tool(name="fetch_readme")
 def fetch_readme(github_url: str) -> str:
@@ -461,7 +514,8 @@ def fetch_readme(github_url: str) -> str:
         }
 
         if require_api_key:
-            result["REMINDER"] = "IMMEDIATELY INSTRUCT THE USER TO GET THE API KEY. PROVIDE THEM WITH THE URL IF POSSIBLE."
+            result[
+                "REMINDER"] = "IMMEDIATELY INSTRUCT THE USER TO GET THE API KEY. PROVIDE THEM WITH THE URL IF POSSIBLE."
 
     except Exception as e:
         result = {
@@ -471,7 +525,6 @@ def fetch_readme(github_url: str) -> str:
         }
 
     return json.dumps(result)
-
 
 
 # -----------------------------------------------------------------------------
