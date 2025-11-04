@@ -89,10 +89,7 @@ except Exception as e:
 mcp = FastMCP("MCP Server Discovery")
 
 # compiling the api key pattern for fetch_readme.md only once here:
-API_KEY_PATTERN_RE = re.compile(
-    r"\b(?:api[-_ ]?key|apikey|x[-_]api[-_]key)\b",
-    re.IGNORECASE
-)
+
 
 # -----------------------------------------------------------------------------
 # LANDING PAGE
@@ -326,40 +323,6 @@ def quick_search(query: str,
     return results
 
 
-def _parse_github_url(url: str) -> Optional[Tuple[str, str, Optional[str], Optional[str]]]:
-    """
-    Parse a GitHub URL to extract owner, repo, branch (if present), and subpath.
-    Examples it understands:
-     - https://github.com/owner/repo
-     - https://github.com/owner/repo/
-     - https://github.com/owner/repo/tree/main/path/to/dir
-     - https://github.com/owner/repo/blob/main/path/to/README.md
-    Returns (owner, repo, branch, subpath) where branch/subpath may be None.
-    """
-    if "github.com/" not in url:
-        return None
-    # Remove protocol
-    path = url.split("github.com/", 1)[1]
-    path = path.strip().rstrip("/")
-    if path.endswith(".git"):
-        path = path[:-4]
-    parts = path.split("/")
-
-    if len(parts) < 2:
-        return None
-    owner, repo = parts[0], parts[1]
-    branch = None
-    subpath = None
-    if len(parts) >= 3:
-        kind = parts[2]  # e.g., "tree" or "blob" or something else
-        if kind in ("tree", "blob") and len(parts) >= 4:
-            branch = parts[3]
-            if len(parts) >= 5:
-                subpath = "/".join(parts[4:])
-        else:
-            # Could be direct owner/repo/<something>; treat that as subpath on default branch
-            subpath = "/".join(parts[2:])
-    return owner, repo, branch, subpath
 
 
 @mcp.tool()
@@ -406,125 +369,10 @@ def fetch_readme(github_url: str) -> str:
       - content: README text (empty on error)
       - REMINDER: only present when require_api_key is True
     """
-    import os
-    import json
-    import requests
+    
+    # TODO: Fetch from database instead
+    # search for the url in servesr table, and fetch the readme content
 
-    try:
-        parsed = _parse_github_url(github_url)
-        if parsed is None:
-            # Not parseable as GitHub URL: return empty content per spec
-            result = {
-                "status": "error: no support for non github urls for now. ",
-                "require_api_key": False,
-                "content": ""
-            }
-            return json.dumps(result)
-
-        owner, repo_name, branch, subpath = parsed
-
-        # Attempt fetching raw README via raw.githubusercontent.com
-        # Determine branch: if not in URL, we may need to query API for default branch
-        use_branch = branch
-        if subpath:
-            # Directory: look for README.md inside that dir
-            # Avoid naive strip; ensure path ends without trailing slash
-            normalized_subpath = subpath.rstrip("/").lstrip("/")
-            readme_path_fragment = f"{normalized_subpath}/README.md"
-        else:
-            # Root: README.md at root
-            readme_path_fragment = "README.md"
-
-        raw_content = None
-
-        # If branch unknown, try common defaults first before hitting API
-        candidate_branches = []
-        if use_branch:
-            candidate_branches.append(use_branch)
-        else:
-            candidate_branches.extend(["main", "master"])
-
-        # We'll only query PyGithub for default branch if raw attempts fail and PyGithub is available
-        for br in candidate_branches:
-            raw_url = f"https://raw.githubusercontent.com/{owner}/{repo_name}/{br}/{readme_path_fragment}"
-            try:
-                resp = requests.get(raw_url, headers=HEADER, timeout=10)
-                if resp.status_code == 200:
-                    raw_content = resp.text
-                    use_branch = br
-                    break
-            except Exception:
-                # swallow and continue
-                pass
-
-        # If still no content, try to get default branch via API and fetch raw README there
-        if raw_content is None:
-            print(f"Fetching README from GitHub API for {owner}/{repo_name} on branch {use_branch}")
-            try:
-                from github import Github
-                token = os.getenv("GITHUB_TOKEN", None)
-                gh = Github(token) if token else Github()
-                repo = gh.get_repo(f"{owner}/{repo_name}")
-                if not use_branch:
-                    use_branch = getattr(repo, "default_branch", None)
-                if use_branch:
-                    raw_url = f"https://raw.githubusercontent.com/{owner}/{repo_name}/{use_branch}/{readme_path_fragment}"
-                    resp = requests.get(raw_url, headers=HEADER, timeout=10)
-                    if resp.status_code == 200:
-                        raw_content = resp.text
-                # Fallback: use GitHub API to get the README for that directory
-                if raw_content is None:
-                    target_dir = subpath or ""
-                    candidate_readme_path = (
-                        target_dir if target_dir.lower().endswith("readme.md") else f"{target_dir}/README.md"
-                    ).lstrip("/")
-                    try:
-                        content_file = repo.get_contents(candidate_readme_path, ref=use_branch)
-                        if content_file and getattr(content_file, "decoded_content", None):
-                            raw_content = content_file.decoded_content.decode()
-                    except Exception:
-                        # Last resort: root README
-                        try:
-                            root_readme = repo.get_readme(ref=use_branch)
-                            raw_content = root_readme.decoded_content.decode()
-                        except Exception:
-                            pass
-            except ImportError:
-                # PyGithub not installed; already tried raw.githubusercontent.com
-                pass
-            except Exception:
-                # swallow to allow downstream error handling
-                pass
-
-        if raw_content is None:
-            result = {
-                "status": f"error: could not locate README in '{github_url}' (tried raw fetch and API)",
-                "require_api_key": False,
-                "content": ""
-            }
-            return json.dumps(result)
-
-        # Scan for API-key patterns
-        require_api_key = bool(API_KEY_PATTERN_RE.search(raw_content))
-
-        result = {
-            "status": "success",
-            "require_api_key": require_api_key,
-            "content": raw_content
-        }
-
-        if require_api_key:
-            result[
-                "REMINDER"] = "IMMEDIATELY INSTRUCT THE USER TO GET THE API KEY. PROVIDE THEM WITH THE URL IF POSSIBLE."
-
-    except Exception as e:
-        result = {
-            "status": f"error: {e}",
-            "require_api_key": False,
-            "content": ""
-        }
-
-    return json.dumps(result)
 
 
 # -----------------------------------------------------------------------------
