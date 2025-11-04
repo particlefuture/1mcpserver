@@ -76,12 +76,15 @@ else:  # Vector Database is empty, so we need to build the index
     vector_store = FAISS.from_documents(docs, embeddings)
     vector_store.save_local(INDEX_DIR)
 
-# perform a similarity search to ensure we can query the vector store
-try:
-    res = vector_store.similarity_search("weather", k=1)
-    print(f"Result: {res}.")
-except Exception as e:
-    raise HTTPException(status_code=500, detail=f"Failed to initialize vector store: {e}")
+def test_vector_store():
+    """
+    Test the vector store by performing a similarity search.
+    """
+    try:
+        res = vector_store.similarity_search("weather", k=1)
+        print(f"Result: {res}.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to initialize vector store: {e}")
 
 # -----------------------------------------------------------------------------
 # 3. Initialize FastMCP, register tool
@@ -358,20 +361,57 @@ def file_system_config_setup():
 @mcp.tool(name="fetch_readme")
 def fetch_readme(github_url: str) -> str:
     """
-    Fetch the README content for a GitHub URL. If the URL is not for GitHub, returns empty content.
-    Attempts to locate the README.md in the indicated directory (e.g., for
-    https://github.com/owner/repo/tree/main/path, it fetches README.md inside path).
-    First tries raw.githubusercontent.com; if that fails, falls back to PyGithub API.
-
+    Fetch the README content for a GitHub URL from the database.
+    
     Returns JSON string with keys:
       - status: "success" or "error: <message>"
-      - require_api_key: bool (heuristic scan)
+      - require_api_key: bool (from database)
       - content: README text (empty on error)
       - REMINDER: only present when require_api_key is True
     """
+    import sqlite3
     
-    # TODO: Fetch from database instead
-    # search for the url in servesr table, and fetch the readme content
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT readme_content, require_api_key FROM servers WHERE url = ?",
+            (github_url,)
+        )
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row is None:
+            print(f"No match found in database for URL: {github_url}")
+            result = {
+                "status": f"error: no match found in database for URL: {github_url}",
+                "require_api_key": False,
+                "content": ""
+            }
+            return json.dumps(result)
+        
+        readme_content, require_api_key = row
+        require_api_key_bool = bool(require_api_key) if require_api_key is not None else False
+        
+        result = {
+            "status": "success",
+            "require_api_key": require_api_key_bool,
+            "content": readme_content or ""
+        }
+        
+        if require_api_key_bool:
+            result["REMINDER"] = "IMMEDIATELY INSTRUCT THE USER TO GET THE API KEY. PROVIDE THEM WITH THE URL IF POSSIBLE."
+        
+        return json.dumps(result)
+        
+    except Exception as e:
+        print(f"Error fetching readme from database for URL {github_url}: {e}")
+        result = {
+            "status": f"error: {e}",
+            "require_api_key": False,
+            "content": ""
+        }
+        return json.dumps(result)
 
 
 
@@ -379,29 +419,33 @@ def fetch_readme(github_url: str) -> str:
 # 4. Run as a stdio MCP server
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
-    import argparse
+    # import argparse
 
-    parser = argparse.ArgumentParser(description="Run MCP Server Discovery")
-    parser.add_argument(
-        "--local",
-        action="store_true",
-        help="Run server locally via stdio instead of HTTP",
-    )
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser(description="Run MCP Server Discovery")
+    # parser.add_argument(
+    #     "--local",
+    #     action="store_true",
+    #     help="Run server locally via stdio instead of HTTP",
+    # )
+    # args = parser.parse_args()
 
-    if args.local:
-        # ---- Standard I/O server BLOCK ----
-        asyncio.run(
-            mcp.run_async(
-                transport="stdio",
-            )
-        )
-    else:
-        # ---- Streamable HTTP server BLOCK ----
-        asyncio.run(
-            mcp.run_async(
-                transport="streamable-http",
-                host="0.0.0.0",
-                port=int(os.getenv("PORT", 8080)),
-            )
-        )
+    # if args.local:
+    #     # ---- Standard I/O server BLOCK ----
+    #     asyncio.run(
+    #         mcp.run_async(
+    #             transport="stdio",
+    #         )
+    #     )
+    # else:
+    #     # ---- Streamable HTTP server BLOCK ----
+    #     asyncio.run(
+    #         mcp.run_async(
+    #             transport="streamable-http",
+    #             host="0.0.0.0",
+    #             port=int(os.getenv("PORT", 8080)),
+    #         )
+    #     )
+    
+    result = fetch_readme("https://github.com/1mcp-app/agent")
+    print(result)
+    
