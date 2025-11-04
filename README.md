@@ -120,6 +120,11 @@ There are multiple stages in the deep search:
 
 *We're supposed to put deep search as a prompt, but both cursor and claude rarely calls prompts. 
 
+### Database Pipeline
+1. Find the list of possible MCP servers by calling `get_all_sources`
+2. Parse through each line to find the github 
+3. Call `update_db` on the list of, which
+   1. 
 
 # Change Log:
 - July 31 2025: Upgrade to 0.2.0. Added agentic planning. For complex tasks, the server now prompts the LLM to perform multi-step MCP server query.

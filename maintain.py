@@ -4,6 +4,7 @@ import sqlite3
 
 
 def maintain_db(db_path):
+    # Removes servers that are no longer accessible
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute('SELECT name, url FROM servers')
