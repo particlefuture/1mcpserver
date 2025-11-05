@@ -22,9 +22,11 @@ HEADER = {
         "Chrome/58.0.3029.110 Safari/537.3"
     )
 }
-DB_PATH = 'db/server_list.db'
-TXT_PATH = 'db/mcp_servers.txt'
-INDEX_DIR = "db/faiss_index"
+
+DATADIR = os.getenv("DATADIR", "db")
+DB_PATH = os.path.join(DATADIR, 'server_list.db')
+TXT_PATH = os.path.join(DATADIR, 'mcp_servers.txt')
+INDEX_DIR = os.path.join(DATADIR, "faiss_index")
 
 # Scraping functions
 
