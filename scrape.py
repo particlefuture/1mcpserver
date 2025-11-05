@@ -50,12 +50,12 @@ def get_source1():
 
 
 def get_source2():
-    repo_url = "https://raw.githubusercontent.com/metorial/mcp-containers/refs/heads/main/README.md"
+    repo_url = "https://raw.githubusercontent.com/metorial/mcp-index/refs/heads/main/README.md"
     response = requests.get(repo_url, headers=HEADER)
     text = response.text
     text = re.sub(r'<img[^>]*>', '', text)
     text = re.sub(r'\*\*', '', text)
-    section = text.split("## Featured Servers", 1)[1]
+    section = text.split("## Official Servers", 1)[1]
     section = section.split("# License", 1)[0].replace("## Available Servers", '')
     lines = [clean_text(ln) for ln in section.split("\n\n") if ln.strip().startswith("- ")]
     return lines
