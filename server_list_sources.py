@@ -11,7 +11,7 @@ def get_source1():
 
 
 def get_source2():
-    repo_url = "https://raw.githubusercontent.com/metorial/mcp-containers/refs/heads/main/README.md"
+    repo_url = "https://raw.githubusercontent.com/metorial/metorial-index/refs/heads/main/README.md"
     response = requests.get(repo_url, headers=HEADER)
     text = response.text
     text = re.sub(r'<img[^>]*>', '', text)
