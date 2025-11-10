@@ -7,7 +7,7 @@ dependencies = [
     "asyncio>=3.4.3",
     "faiss-cpu>=1.11.0",
     "fastapi>=0.115.14",
-    "fastmcp==2.6.1",
+    "fastmcp>=2.13.0.2",
     "google-auth>=2.40.3",
     "langchain>=0.3.26",
     "langchain-community>=0.3.27",

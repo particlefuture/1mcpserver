@@ -4,12 +4,11 @@ import asyncio
 import json
 import os
 import re
-from typing import List, Literal, Any
+from typing import List, Literal, Any, Dict
 from typing import Tuple, Optional
 import os
 from pathlib import Path
 
-from fastmcp import FastMCP
 from fastapi.responses import FileResponse, PlainTextResponse
 from starlette.requests import Request
 import requests
@@ -17,7 +16,7 @@ from fastapi import HTTPException
 from fastmcp import FastMCP
 from github import Github
 # LangChain RAG imports
-from langchain.schema import Document
+from langchain_core.documents.base import Document
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -146,7 +145,7 @@ def vector_store_search(query: str, top_k: int = 20) -> List[Document]:
     Returns the top_k entries most similar to `query`.
     """
     try:
-        matches = vector_store.similarity_search(query, k=top_k)
+        matches = vector_store.similarity_search(query, k=top_k, fetch_k=10000)
         return matches
     except Exception as e:
         return []
@@ -299,7 +298,7 @@ def validate_mcp_config(mcp_config_content: str) -> bool:
 
 @mcp.tool()
 def quick_search(query: str,
-                 top_k: int = 100) -> list[str]:
+                 top_k: int = 50) -> Any:  #list[dict[str, Any]]
     """
     This tool is for queries with explicit description of MCP functionality.
     Given a free-text MCP description query, return the top_k matching MCP servers text descriptions
@@ -323,6 +322,16 @@ def quick_search(query: str,
             "url": md.get("url", "")
         })
 
+    # log the results and types to logs/quick_search_results.log
+    log_path = Path("logs/quick_search_results.log")
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open("a") as f:
+        f.write(f"Query: {query}\n")
+        f.write(f"Results:\n")
+        for res in results:
+            f.write(f"{res}\n")
+        f.write("\n")
+    
     return results
 
 
@@ -420,37 +429,38 @@ def test_fetch_readme():
     """
     result = fetch_readme("https://github.com/1mcp-app/agent")
     print(result)
+#
+# # -----------------------------------------------------------------------------
+# # 4. Run as a stdio MCP server
+# # -----------------------------------------------------------------------------
+# if __name__ == "__main__":
+#     import argparse
+#
+#     parser = argparse.ArgumentParser(description="Run MCP Server Discovery")
+#     parser.add_argument(
+#         "--local",
+#         action="store_true",
+#         help="Run server locally via stdio instead of HTTP",
+#     )
+#     args = parser.parse_args()
+#
+#     if args.local:
+#         # ---- Standard I/O server BLOCK ----
+#         asyncio.run(
+#             mcp.run_async(
+#                 transport="stdio",
+#             )
+#         )
+#     else:
+#         # ---- Streamable HTTP server BLOCK ----
+#         asyncio.run(
+#             mcp.run_async(
+#                 transport="streamable-http",
+#                 host="0.0.0.0",
+#                 port=int(os.getenv("PORT", 8080)),
+#             )
+#         )
+#
 
-# -----------------------------------------------------------------------------
-# 4. Run as a stdio MCP server
-# -----------------------------------------------------------------------------
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Run MCP Server Discovery")
-    parser.add_argument(
-        "--local",
-        action="store_true",
-        help="Run server locally via stdio instead of HTTP",
-    )
-    args = parser.parse_args()
-
-    if args.local:
-        # ---- Standard I/O server BLOCK ----
-        asyncio.run(
-            mcp.run_async(
-                transport="stdio",
-            )
-        )
-    else:
-        # ---- Streamable HTTP server BLOCK ----
-        asyncio.run(
-            mcp.run_async(
-                transport="streamable-http",
-                host="0.0.0.0",
-                port=int(os.getenv("PORT", 8080)),
-            )
-        )
     
-
-    
+print(vector_store.similarity_search("test", k=10, fetch_k=10000))
