@@ -429,38 +429,37 @@ def test_fetch_readme():
     """
     result = fetch_readme("https://github.com/1mcp-app/agent")
     print(result)
-#
-# # -----------------------------------------------------------------------------
-# # 4. Run as a stdio MCP server
-# # -----------------------------------------------------------------------------
-# if __name__ == "__main__":
-#     import argparse
-#
-#     parser = argparse.ArgumentParser(description="Run MCP Server Discovery")
-#     parser.add_argument(
-#         "--local",
-#         action="store_true",
-#         help="Run server locally via stdio instead of HTTP",
-#     )
-#     args = parser.parse_args()
-#
-#     if args.local:
-#         # ---- Standard I/O server BLOCK ----
-#         asyncio.run(
-#             mcp.run_async(
-#                 transport="stdio",
-#             )
-#         )
-#     else:
-#         # ---- Streamable HTTP server BLOCK ----
-#         asyncio.run(
-#             mcp.run_async(
-#                 transport="streamable-http",
-#                 host="0.0.0.0",
-#                 port=int(os.getenv("PORT", 8080)),
-#             )
-#         )
-#
 
-    
-print(vector_store.similarity_search("test", k=10, fetch_k=10000))
+
+# -----------------------------------------------------------------------------
+# 4. Run as a stdio MCP server
+# -----------------------------------------------------------------------------
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run MCP Server Discovery")
+    parser.add_argument(
+        "--local",
+        action="store_true",
+        help="Run server locally via stdio instead of HTTP",
+    )
+    args = parser.parse_args()
+
+    if args.local:
+        # ---- Standard I/O server BLOCK ----
+        asyncio.run(
+            mcp.run_async(
+                transport="stdio",
+            )
+        )
+    else:
+        # ---- Streamable HTTP server BLOCK ----
+        asyncio.run(
+            mcp.run_async(
+                transport="streamable-http",
+                host="0.0.0.0",
+                port=int(os.getenv("PORT", 8080)),
+            )
+        )
+
+
