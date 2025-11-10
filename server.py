@@ -298,7 +298,7 @@ def validate_mcp_config(mcp_config_content: str) -> bool:
 
 @mcp.tool()
 def quick_search(query: str,
-                 top_k: int = 50) -> Any:  #list[dict[str, Any]]
+                 top_k: int = 50) -> list[dict[str, str]]:
     """
     This tool is for queries with explicit description of MCP functionality.
     Given a free-text MCP description query, return the top_k matching MCP servers text descriptions
@@ -321,16 +321,6 @@ def quick_search(query: str,
             "description": doc.page_content,
             "url": md.get("url", "")
         })
-
-    # log the results and types to logs/quick_search_results.log
-    log_path = Path("logs/quick_search_results.log")
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    with log_path.open("a") as f:
-        f.write(f"Query: {query}\n")
-        f.write(f"Results:\n")
-        for res in results:
-            f.write(f"{res}\n")
-        f.write("\n")
     
     return results
 
