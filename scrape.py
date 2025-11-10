@@ -9,13 +9,13 @@ from typing import List, Tuple
 
 from dotenv import load_dotenv
 
-from langchain.schema import Document
+from langchain_core.documents.base import Document
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 from github import RateLimitExceededException
 
-from server_list_sources import get_all_sources
+# from server_list_sources import get_all_sources
 # ---------------------------------------------------------------------
 # If fetch_readme is in the same file, this import isn't needed.
 # If it's in another module, replace the direct call below accordingly.
@@ -34,25 +34,12 @@ HEADER = {
         "Chrome/58.0.3029.110 Safari/537.3"
     )
 }
-DB_PATH = 'db/server_list.db'
-TXT_PATH = 'db/mcp_servers.txt'
-INDEX_DIR = "db/faiss_index"
 
-# ---------------------------
-# Scraping helper(s)
-# ---------------------------
+BASE_DIR = os.getenv("DATADIR", "db")
 
-def clean_text(text: str) -> List[str]:
-    """
-    Remove tags, bold markdown, new lines, and common emoji ranges from the given text.
-    """
-    clean = re.sub(r"<[^>]+>", "", text)
-    clean = clean.replace("**", "").replace("__", "").replace("\n", "")
-    clean = re.sub(r"[^\x00-\x7F]+", "", clean)
-    return clean
-
-
-
+DB_PATH = os.path.join(BASE_DIR, 'server_list.db')
+TXT_PATH = os.path.join(BASE_DIR, 'mcp_servers.txt')
+INDEX_DIR = os.path.join(BASE_DIR, 'faiss_index')
 
 
 # ---------------------------
@@ -89,7 +76,7 @@ def read_servers_from_txt(txt_path):
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            match = re.match(r'- \[([^\]]+)\]\(([^)]+)\)\s*-\s*(.+)', line)
+            match = re.match(r'-\s*\[([^\]]+)\]\(([^)]+)\)\s*-\s*(.+)', line)
             if not match:
                 print(f"Skipping unrecognized line format: {line}")
                 continue
@@ -324,6 +311,27 @@ def update_db(db_path, servers):
 # Embeddings (now include README)
 # ---------------------------
 
+def truncate_readme(readme):
+    """
+    Truncate README content to include everything from the first '#'
+    and stop at the next non-consecutive '#'. If no such section exists,
+    use the entire content after the first '#'.
+    """
+    lines = readme.splitlines()
+    truncated = []
+    found_first_section = False
+
+    for i, line in enumerate(lines):
+        if line.strip().startswith("#"):
+            if not found_first_section:
+                found_first_section = True
+            elif i > 0 and not lines[i - 1].strip().startswith("#"):
+                break
+        if found_first_section:
+            truncated.append(line)
+
+    return "\n".join(truncated)
+
 def generate_embeddings(db_path):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
@@ -335,7 +343,9 @@ def generate_embeddings(db_path):
     docs = []
     for name, desc, url, readme in rows:
         # Combine description + README for richer retrieval
+        readme = truncate_readme(readme or "") # Only get the intro section of the README
         page_content = ((desc or "") + "\n\n" + (readme or "")).strip()
+        
         if not page_content:
             # Avoid empty docs that can cause embedding errors
             page_content = desc or ""
@@ -359,15 +369,15 @@ if __name__ == '__main__':
     #     f.write("\n".join(sources))
     # print(f"Scraped {len(sources)} server entries to {TXT_PATH}")
 
-    # 2. Initialize / migrate DB
-    create_db_and_table(DB_PATH)
-
-    # 3. Read scraped entries and update DB (with README + flags)
-    servers = read_servers_from_txt(TXT_PATH)
-    if servers:
-        update_db(DB_PATH, servers)
-    else:
-        print(f"No valid servers found in {TXT_PATH}")
+    # # 2. Initialize / migrate DB
+    # create_db_and_table(DB_PATH)
+    #
+    # # 3. Read scraped entries and update DB (with README + flags)
+    # servers = read_servers_from_txt(TXT_PATH)
+    # if servers:
+    #     update_db(DB_PATH, servers)
+    # else:
+    #     print(f"No valid servers found in {TXT_PATH}")
 
     # 4. Generate and save embeddings (now includes README content)
     generate_embeddings(DB_PATH)
