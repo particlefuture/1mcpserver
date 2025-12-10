@@ -325,8 +325,6 @@ def quick_search(query: str,
     return results
 
 
-
-
 @mcp.tool()
 def file_system_config_setup():
     """
