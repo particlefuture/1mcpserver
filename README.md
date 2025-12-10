@@ -1,10 +1,10 @@
 # 1 MCP Server: A MCP server that picks and configures MCP servers for you
 > MCP of MCPs. Automatic discovery and configure MCP servers on your local machine. Remote! 
 
+### After setup, you only need this prompt: "I want to perform <TASK>. Call the `deep_search` tool and follow the outlined steps."
 We aim at providing only this MCP server. Then you can leave all the rest (searching servers, selecting servers, configuring servers, etc) all to this MCP server.
 
 No need to run setup commands, no need to acquire api keys. Just need to modify one file.
-
 
 
 ### Demo video: https://youtu.be/W4EAmaTTb2A 
@@ -13,14 +13,15 @@ No need to run setup commands, no need to acquire api keys. Just need to modify 
 ### Simple remote setup: integration with Cursor and Claude (Option 1) 
 Add the following to curson or claude MCP config file. 
 
-**For Cursor**: Open `~/.cursor/mcp.json`
+**For Cursor**: Open `./cursor/mcp.json`
 
-**For Gemini**: Open `~/.gemini/settings.json`
+**For Gemini**: Open `./gemini/settings.json`
 
 **For Claude**: Open 
 - macOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
+**To configure these mcp servers globally, simply add move the config file to your HOME directory instead of current directory. 
 
 **Add the following to the file:** 
 ```json
