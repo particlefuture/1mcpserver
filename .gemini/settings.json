@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "mcp-servers-discovery": {
+      "command": "/Users/jiazhenghao/.local/bin/uv",
+      "args": [
+        "--directory",
+        "/Users/jiazhenghao/CodingProjects/MCP/1mcpserver",
+        "run",
+        "server.py",
+        "--local"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "."
+      ]
+    }
+  }
+}

@@ -15,6 +15,8 @@ Add the following to curson or claude MCP config file.
 
 **For Cursor**: Open `~/.cursor/mcp.json`
 
+**For Gemini**: Open `~/.gemini/settings.json`
+
 **For Claude**: Open 
 - macOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -29,7 +31,6 @@ Add the following to curson or claude MCP config file.
       "headers": {
         "Accept": "text/event-stream",
         "Cache-Control": "no-cache",
-        "API_KEY": "value"
       }
     }
   }
@@ -47,10 +48,11 @@ If you are already using other servers, the json file should look like this
             }
         },
         "file-system": {
-            "command": "node",
+            "command": "npx",
             "args": [
-                "/Users/jiazhenghao/CodingProjects/MCP/filesystem/index.ts",
-                "~/"
+              "-y",
+              "@modelcontextprotocol/server-filesystem",
+              "."
             ]
         }
     }
@@ -81,21 +83,32 @@ The mcp.json should look like this:
             "command": "/Users/jiazhenghao/.local/bin/uv",
             "args": [
                 "--directory",
-                "{PATH_TO_THE_CLONED_REPO}",
+                "{PATH_TO_THE_CLONED_REPO (e.g. `/Users/ElonMusk/CodingProjects/MCP/1mcpserver`)}",
                 "run",
                 "server.py", 
                "--local"
             ]
         },
         "file-system": {
-            "command": "node",
+            "command": "npx",
             "args": [
-                "{FILE_SYSTEM_CLONED_PATH}/filesystem/index.ts",
-                "~/"
+              "-y",
+              "@modelcontextprotocol/server-filesystem",
+              "."
             ]
         }
     }
 }
+```
+**If you want to give LLM more file-system privilege, adjust, adjust the third argument to something like: 
+```json
+        "file-system": {
+            "command": "npx",
+            "args": [
+              "-y",
+              "@modelcontextprotocol/server-filesystem",
+              "~/" // <- Home directory, or any directory you want to give privilege to
+            ]
 ```
 
 ## Architecture
