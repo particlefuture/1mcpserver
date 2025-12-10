@@ -1,8 +1,9 @@
 # 1 MCP Server: A MCP server that picks and configures MCP servers for you
 > MCP of MCPs. Automatic discovery and configure MCP servers on your local machine. Remote! 
 
-### After setup, you only need this prompt: "I want to perform <TASK>. Call the `deep_search` tool and follow the outlined steps."
-We aim at providing only this MCP server. Then you can leave all the rest (searching servers, selecting servers, configuring servers, etc) all to this MCP server.
+After setup, you only need this prompt: "I want to perform <TASK>. Call the `deep_search` tool and follow the outlined steps."
+
+<sup><sub>We aim at providing only this MCP server. Then you can leave all the rest (searching servers, selecting servers, configuring servers, etc) all to this MCP server.</sub></sup>
 
 No need to run setup commands, no need to acquire api keys. Just need to modify one file.
 
@@ -171,7 +172,8 @@ How Has This Been Tested?
 > Tested with Claude and Cursor with both remote endpoint and local stdio. Tested the demo for 10 times. 
 
 
-
+- add gemini setup on website
+- 
 
 # Trouble shooting
 - If using venv, ModuleNotFoundError even after installing the module -> delete venv and create a new venv. 
