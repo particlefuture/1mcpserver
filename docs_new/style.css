@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background-color: #0f0f0f; /* Very dark grey, almost black */
+    color: #e0e0e0; /* Off-white for text */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header {
+    padding: 2rem 2rem; /* Reduced padding */
+    background: linear-gradient(180deg, #1a1a1a, #0f0f0f); /* Subtle gradient */
+    border-bottom: 1px solid #2a2a2a;
+}
+
+h1 {
+    font-size: 3rem; /* Slightly smaller font size */
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    animation: fadeInDown 1s ease-in-out;
+}
+
+p.animate{
+    font-size: 1.1rem; /* Slightly smaller font size */
+    color: #a0a0a0; /* Medium grey */
+    animation: fadeInUp 1s ease-in-out;
+}
+
+main {
+    padding: 2rem;
+}
+
+section {
+    margin-bottom: 4rem;
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #ffffff;
+    position: relative;
+    display: inline-block;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 3px;
+    background-color: #ffffff; /* White accent */
+    bottom: -10px;
+    left: 20%;
+    transform: scaleX(0);
+    transition: transform 0.5s ease-in-out;
+}
+
+section:hover h2::after {
+    transform: scaleX(1);
+}
+
+.tabs {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #1a1a1a; /* Dark grey container */
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #333;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tab-nav {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #333;
+    margin-bottom: 1.5rem;
+}
+
+.tab-link {
+    background: none;
+    border: none;
+    color: #888;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-link:hover {
+    color: #ccc;
+}
+
+.tab-link.active {
+    color: #ffffff;
+    border-bottom: 2px solid #ffffff;
+}
+
+.tab-content {
+    display: none;
+    padding: 1rem;
+    text-align: left;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+pre {
+    background: #000000;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1.5rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-top: 1rem;
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+    color: #d4d4d4;
+    font-size: 0.95rem;
+}
+
+#demo iframe {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 800px;
+    height: 450px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    border: 1px solid #333;
+}
+
+#demo iframe:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
