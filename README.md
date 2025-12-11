@@ -173,7 +173,7 @@ How Has This Been Tested?
 
 
 - add gemini setup on website
-- 
+- add gemini support in tool calls
 
 # Trouble shooting
 - If using venv, ModuleNotFoundError even after installing the module -> delete venv and create a new venv. 
