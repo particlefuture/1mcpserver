@@ -238,7 +238,7 @@ def find_mcp_config_path(
     if app_config is None:
         return (
             "Couldn't find the MCP config path for the given application. "
-            "Please add it to MCP_CONFIG_PATHS."
+            "Please add it to send an issue or PR on github: https://github.com/particlefuture/1mcpserver. Thanks!"
         )
 
     path = app_config.get(os)
