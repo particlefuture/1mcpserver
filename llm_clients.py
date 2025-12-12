@@ -28,6 +28,9 @@ MCP_CONFIG_PATHS: Final[dict[Application, dict[OS, str]]] = {
     Application.GEMINICLI: {
         OS.MAC: "./gemini/settings.json",
         OS.WINDOWS: r'.\gemini\settings.json',
+    },
+    Application.CODEX: {
+        OS.MAC: "~/.codex/config.toml"
     }
 }
 
