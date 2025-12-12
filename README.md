@@ -26,6 +26,9 @@ Add the following to your MCP Client config file.
 - macOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
+**For [Codex](https://developers.openai.com/codex/mcp#configuration---configtoml)**: Open
+- d
+
 **To configure these mcp servers globally, simply add move the config file to your HOME directory instead of current directory. 
 
 **Add the following to the file:** 
@@ -178,3 +181,4 @@ How Has This Been Tested?
 # Trouble shooting
 - If using venv, ModuleNotFoundError even after installing the module -> delete venv and create a new venv. 
 
+["--directory", "./", "run", "server.py", "--local"]
