@@ -181,11 +181,7 @@ def deep_search_planning():
       - If there is an API KEY, Immediately provide the user with instructions to obtain any missing keys.  
       - Store configured keys in the environment or secrets file.  
    c. **Prepare MCP Config**  
-      1. Invoke `configure_mcp_plan()` to generate the local plan for updating `mcp.json`.  
-      2. Use `find_mcp_config_path` to locate the correct `mcp.json` path for this server.  
-      3. Use the filesystem mcp server tool to read the current `mcp.json`.  
-      4. Use the `add_mcp_tool` to produce the new JSON content.  
-      5. Use the filesystem mcp server tool to write the updated content back.  
+      - Invoke `configure_mcp_plan()` to generate the plan for adding the mcp server to the config file.
 
 4. **Finalize**  
    - Once all servers are configured, summarize the completed setup steps and next actions for the user."""
@@ -197,14 +193,53 @@ def configure_mcp_plan():
     Returns a plan for the next steps to do.
     """
     return f"""Execute the following steps to add the mcp server:
-    1. Ask for the raw json mcp content. 
-    2. Use the find_mcp_config_path tool to determine the path to the mcp. (Determine the application and operating system yourself)
-    3. Create the mcp config file if not exist.  
-    4. Use the filesystem mcp server to read the content.  
-    5. Validate the content to write to mcp server by calling `validate_mcp_config` tool. 
+    1. Use the find_mcp_config_path tool to determine the path to the mcp. (Determine the application and operating system yourself)
+    2. Create the mcp config file if not exist.
+    3. Use the filesystem mcp server to read the content.
+    4. Generate the config file contents to add the new mcp server.
+    5. Double-check the content to write to mcp server is in correct format. If you are unsure, you can find an example config file by calling example_mcp_config_file().
     6. Use the filesystem mcp server to write the new content to the mcp config file with the updated content. The new content must be a json object with a top-level `mcpServers` key, whose value is an object mapping server names to their configurations.  
     """
 
+from typing import Literal
+import json
+
+@mcp.tool(
+    name="example_mcp_config_file",
+    description=(
+        "Return a minimal example MCP config for the given file type (json/toml). "
+        "Note: this is only a simple template—NOT an exhaustive list of all supported fields."
+    ),
+)
+def example_mcp_config_file(file_type: Literal["json", "toml"]) -> str:
+    example = {
+        "mcpServers": {
+            "my-mcp-server": {
+                "command": "python",
+                "args": ["-m", "my_mcp_server"],
+                "env": {
+                    "API_KEY_NAME": "KEY_VAL",
+                },
+            }
+        }
+    }
+
+    ft = file_type.lower().strip()
+    if ft == "json":
+        return json.dumps(example, indent=2, ensure_ascii=False) + "\n"
+
+    if ft == "toml":
+        return (
+            '# NOTE: simple template only — not an exhaustive list of supported fields.\n'
+            '[mcpServers."my-mcp-server"]\n'
+            'command = "python"\n'
+            'args = ["-m", "my_mcp_server"]\n'
+            "\n"
+            '[mcpServers."my-mcp-server".env]\n'
+            'API_KEY_NAME = "KEY_VAL"\n'
+        )
+
+    return "only 'json' or 'toml' config file types supported for now. "
 
 from llm_clients import Application, OS, MCP_CONFIG_PATHS
 
@@ -238,7 +273,7 @@ def find_mcp_config_path(
     if app_config is None:
         return (
             "Couldn't find the MCP config path for the given application. "
-            "Please add it to send an issue or PR on github: https://github.com/particlefuture/1mcpserver. Thanks!"
+            "Please submit and issue or PR on github: https://github.com/particlefuture/1mcpserver. Thanks!!"
         )
 
     path = app_config.get(os)
@@ -251,76 +286,6 @@ def find_mcp_config_path(
         )
 
     return path
-
-
-@mcp.tool(name="validate_mcp_config_content")
-def validate_mcp_config(mcp_config_content: str) -> bool:
-    """
-    Validate the MCP config content.
-    The content must be a JSON object with a top-level `mcpServers` key,
-    whose value is an object mapping server names to their configurations.
-
-    Returns True if the content meets the minimal schema, False otherwise.
-    """
-    try:
-        obj = json.loads(mcp_config_content)
-    except json.JSONDecodeError:
-        return False
-
-    if not isinstance(obj, dict):
-        return False
-
-    # top level key must be `mcpServers`
-    mcp_servers = obj.get("mcpServers")
-    if not isinstance(mcp_servers, dict):
-        return False
-
-    allowed_types = {"local", "http", "sse", "stdio"}
-
-    def is_str_dict(d: Any) -> bool:
-        if not isinstance(d, dict):
-            return False
-        return all(isinstance(k, str) and isinstance(v, str) for k, v in d.items())
-
-    for name, cfg in mcp_servers.items():
-        if not isinstance(name, str):
-            return False
-        if not isinstance(cfg, dict):
-            return False
-
-        has_command = "command" in cfg and isinstance(cfg["command"], str)
-        has_url = "url" in cfg and isinstance(cfg["url"], str)
-
-        if not (has_command or has_url):
-            # minimally one of command or url must exist
-            return False
-
-        if "args" in cfg:
-            if not isinstance(cfg["args"], list) or not all(isinstance(a, str) for a in cfg["args"]):
-                return False
-
-        if "env" in cfg:
-            if not is_str_dict(cfg["env"]):
-                return False
-
-        if "headers" in cfg:
-            if not is_str_dict(cfg["headers"]):
-                return False
-
-        if "type" in cfg:
-            if not isinstance(cfg["type"], str) or cfg["type"] not in allowed_types:
-                return False
-
-        if "tools" in cfg:
-            tools = cfg["tools"]
-            if not isinstance(tools, list) or not all(isinstance(t, str) for t in tools):
-                return False
-            # wildcard allowed
-            if len(tools) == 1 and tools[0] == "*":
-                pass  # okay
-        # other fields are tolerated
-
-    return True
 
 
 @mcp.tool()

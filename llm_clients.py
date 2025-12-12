@@ -7,6 +7,7 @@ class Application(str, Enum):
     CLAUDE = "Claude"
     GEMINICLI = "Gemini"
     CODEX = "Codex"
+    OTHERS = "Others"
 
 
 class OS(str, Enum):
@@ -31,6 +32,6 @@ MCP_CONFIG_PATHS: Final[dict[Application, dict[OS, str]]] = {
     },
     Application.CODEX: {
         OS.MAC: "~/.codex/config.toml"
-    }
+    },
 }
 

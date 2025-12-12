@@ -1,4 +1,0 @@
-[mcp_servers.mcpServerDiscovery]
-command = "/Users/jiazhenghao/.local/bin/uv"
-args = ["--directory", "./", "run", "server.py", "--local"]
-
