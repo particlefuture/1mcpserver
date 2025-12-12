@@ -169,11 +169,7 @@ Motivation and Context:
 > Right now, most MCP server search are done via github searching or online google search. There has been several MCP wrappers, but most serves as an middleware infrastructure that hosts different MCP at an endpoint. The gathering of which MCP to host is still mostly done by manual search. We provide an automatic pipeline of not only searching but also automatically configuring MCP servers.
 
 How Has This Been Tested?
-> Tested with Claude and Cursor with both remote endpoint and local stdio. Tested the demo for 10 times. 
-
-
-- add gemini setup on website
-- add gemini support in tool calls
+> Tested with Claude and Cursor with both remote endpoint and local stdio. Tested the demo for 10 times.
 
 # Trouble shooting
 - If using venv, ModuleNotFoundError even after installing the module -> delete venv and create a new venv. 
