@@ -206,24 +206,66 @@ def configure_mcp_plan():
     """
 
 
-@mcp.tool(name="find_mcp_config_path_path",
-          description=(
-                  "Determine what the MCP config path is based on users application and operating system. Before calling this tool, you must call `configure_mcp_plan`. "
-          ))
-def find_mcp_config_path(application: Literal['Cursor', 'Claude'], os: Literal["Mac", "Windows"] = "Mac") -> str:
-    config_path = ""
-    if application == 'Cursor':
-        config_path = "./.cursor/mcp.json"
-    elif application == 'Claude':
-        if os == "Mac":
-            config_path = "~/Library/Application Support/Claude/claude_desktop_config.json"
-        elif os == "Windows":
-            config_path = r"%APPDATA%\Claude\claude_desktop_config.json"
-        else:
-            config_path = "Sorry, Linux is not supported. Ask Linus Torvalds to add support for it."
-    else:
-        config_path = "Couldn't find the MCP config path for the given application. Please specify either 'Cursor' or 'Claude' or add a few lines of code in our github repo."
-    return config_path
+from llm_clients import Application, OS, MCP_CONFIG_PATHS
+
+
+@mcp.tool(
+    name="find_mcp_config_path_path",
+    description=(
+            "Determine what the MCP config path is based on users application and operating system."
+    ),
+)
+def find_mcp_config_path_test(
+        application: Application,
+        os: OS = OS.MAC,
+) -> str:
+    app_config = MCP_CONFIG_PATHS.get(application)
+    if app_config is None:
+        return (
+            "Couldn't find the MCP config path for the given application. "
+            "Please add it to MCP_CONFIG_PATHS."
+        )
+    
+    path = app_config.get(os)
+    if path is None:
+        if os is OS.LINUX:
+            return "Sorry, Linux is not supported. Ask Linus Torvalds to add support for it."
+        return (
+            f"Couldn't find the MCP config path for {application.value} on {os.value}. "
+            "Please add it to MCP_CONFIG_PATHS."
+        )
+    
+    return path
+
+
+@mcp.tool(
+    name="find_mcp_config_path_path",
+    description=(
+        "Determine what the MCP config path is based on users application and operating system. You should be able to infor the application. "
+        "Before calling this tool, you must call `configure_mcp_plan`."
+    ),
+)
+def find_mcp_config_path(
+    application: Application,
+    os: OS = OS.MAC,
+) -> str:
+    app_config = MCP_CONFIG_PATHS.get(application)
+    if app_config is None:
+        return (
+            "Couldn't find the MCP config path for the given application. "
+            "Please add it to MCP_CONFIG_PATHS."
+        )
+
+    path = app_config.get(os)
+    if path is None:
+        if os is OS.LINUX:
+            return "Sorry, Linux is not supported. Ask Linus Torvalds to add support for it."
+        return (
+            f"Couldn't find the MCP config path for {application.value} on {os.value}. "
+            "Please add it to MCP_CONFIG_PATHS."
+        )
+
+    return path
 
 
 @mcp.tool(name="validate_mcp_config_content")
