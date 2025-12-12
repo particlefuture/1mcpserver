@@ -12,11 +12,15 @@ No need to run setup commands, no need to acquire api keys. Just need to modify 
 # Set up Instruction
 
 ### Simple remote setup: integration with Cursor and Claude (Option 1) 
-Add the following to curson or claude MCP config file. 
+Visit https://mcp.1mcpserver.com/ for setup instructions and support on all architectures. You just need to add one single file 
+
+If you are on a Mac: 
+
+Add the following to your MCP Client config file. 
 
 **For Cursor**: Open `./cursor/mcp.json`
 
-**For Gemini**: Open `./gemini/settings.json`
+**For [Gemini](https://geminicli.com/docs/tools/mcp-server/#how-to-set-up-your-mcp-server)**: Open `./gemini/settings.json`
 
 **For Claude**: Open 
 - macOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
