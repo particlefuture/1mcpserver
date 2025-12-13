@@ -8,10 +8,7 @@ After setup, you can usually just say:
 
 The goal is that you only install **this** MCP server, and it handles the rest (searching servers, selecting servers, configuring servers, etc.).
 
-### Demo video 🎥
-[![Demo Video](https://youtu.be/W4EAmaTTb2A/0.jpg)](https://youtu.be/W4EAmaTTb2A)
-
-[https://youtu.be/W4EAmaTTb2A](https://youtu.be/W4EAmaTTb2A) 
+### Demo video 🎥: [https://youtu.be/W4EAmaTTb2A](https://youtu.be/W4EAmaTTb2A) 
 
 Choose **one** of the following:
 
