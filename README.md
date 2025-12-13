@@ -1,184 +1,259 @@
-# 1 MCP Server: A MCP server that picks and configures MCP servers for you
-> MCP of MCPs. Automatic discovery and configure MCP servers on your local machine. Remote! 
+# 1 MCP Server 🚀
 
-After setup, you only need this prompt: "I want to perform <TASK>. Call the `deep_search` tool and follow the outlined steps."
+> **MCP of MCPs** — automatically discover and configure MCP servers on your machine (remote or local).
 
-<sup><sub>We aim at providing only this MCP server. Then you can leave all the rest (searching servers, selecting servers, configuring servers, etc) all to this MCP server.</sub></sup>
+After setup, you can usually just say:
 
-No need to run setup commands, no need to acquire api keys. Just need to modify one file.
+> “I want to perform . Call the `deep_search` tool and follow the outlined steps.”
 
+The goal is that you only install **this** MCP server, and it handles the rest (searching servers, selecting servers, configuring servers, etc.).
 
-### Demo video: https://youtu.be/W4EAmaTTb2A 
-# Set up Instruction
+### Demo video 🎥
+[![Demo Video](https://youtu.be/W4EAmaTTb2A/0.jpg)](https://youtu.be/W4EAmaTTb2A)
 
-### Simple remote setup: integration with Cursor and Claude (Option 1) 
-Visit https://mcp.1mcpserver.com/ for setup instructions and support on all architectures. You just need to add one single file 
+[https://youtu.be/W4EAmaTTb2A](https://youtu.be/W4EAmaTTb2A) 
 
-If you are on a Mac: 
+Choose **one** of the following:
 
-Add the following to your MCP Client config file. 
+1. **Remote** (fastest)
+2. **Local (prebuilt)** — **Docker**, **uvx**, or **npx**
+3. **Local (from source)** — run this repo directly
 
-**For Cursor**: Open `./cursor/mcp.json`
+### 1) Remote 🌍
 
-**For [Gemini](https://geminicli.com/docs/tools/mcp-server/#how-to-set-up-your-mcp-server)**: Open `./gemini/settings.json`
+Use the hosted endpoint (recommended for the simplest setup).
 
-**For Claude**: Open 
-- macOS: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+**Docs + guided setup:** [https://mcp.1mcpserver.com/](https://mcp.1mcpserver.com/)
 
-**For [Codex](https://developers.openai.com/codex/mcp#configuration---configtoml)**: Open
-- d
+#### Configure your MCP client
 
-**To configure these mcp servers globally, simply add move the config file to your HOME directory instead of current directory. 
+Add the following entry to your client config file:
 
-**Add the following to the file:** 
+* **Cursor**: `./.cursor/mcp.json`
+* **Gemini CLI**: `./gemini/settings.json` (see Gemini docs)
+* **Claude Desktop**:
+
+  * macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+  * Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+* **Codex**: see Codex MCP configuration docs
+
+**Remote config (JSON):**
+
 ```json
 {
   "mcpServers": {
-    "mcp-server-discovery": {
+    "1mcpserver": {
       "url": "https://mcp.1mcpserver.com/mcp/",
       "headers": {
         "Accept": "text/event-stream",
-        "Cache-Control": "no-cache",
+        "Cache-Control": "no-cache"
       }
     }
   }
 }
 ```
-If you are already using other servers, the json file should look like this
+
+If you already have other servers configured, just merge this entry under `mcpServers`:
+
 ```json
 {
-    "mcpServers": {
-        "mcp-server-discovery": {
-            "url": "https://mcp.1mcpserver.com/mcp/",
-            "headers": {
-                "Accept": "text/event-stream",
-                "Cache-Control": "no-cache"
-            }
-        },
-        "file-system": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "@modelcontextprotocol/server-filesystem",
-              "."
-            ]
-        }
+  "mcpServers": {
+    "1mcpserver": {
+      "url": "https://mcp.1mcpserver.com/mcp/",
+      "headers": {
+        "Accept": "text/event-stream",
+        "Cache-Control": "no-cache"
+      }
+    },
+    "file-system": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
     }
+  }
 }
 ```
 
-### (Option 2) Local Setup with STDIO
+**Tip:** If your client supports it, move the config file into your **home directory** to apply globally.
+
+---
+
+### 2) Local (prebuilt) 💻
+
+Use this when you want everything local, or when your MCP client only supports **STDIO**.
+
+#### 2A) Docker 🐳
+
+> Use this if you want an isolated runtime and a single, reproducible command.
+
+```bash
+docker run --rm -i \
+  -e DATADIR=/data \
+  -v "$PWD/db:/data" \
+  <YOUR_DOCKER_IMAGE_HERE>
 ```
+
+```json
+{
+  "mcpServers": {
+    "1mcpserver": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "DATADIR=/data",
+        "-v",
+        "${PWD}/db:/data",
+        "<YOUR_DOCKER_IMAGE_HERE>"
+      ]
+    }
+  }
+}
+```
+
+#### 2B) uvx 🐍
+
+> Use this if you publish the server as a Python package and want a one-liner.
+
+```bash
+uvx <YOUR_PACKAGE_NAME> --local
+```
+
+```json
+{
+  "mcpServers": {
+    "1mcpserver": {
+      "command": "uvx",
+      "args": ["<YOUR_PACKAGE_NAME>", "--local"]
+    }
+  }
+}
+```
+
+#### 2C) npx 📦
+
+> Use this if you publish a Node wrapper / launcher and want a one-liner.
+
+```bash
+npx -y <YOUR_NPM_PACKAGE_NAME>
+```
+
+```json
+{
+  "mcpServers": {
+    "1mcpserver": {
+      "command": "npx",
+      "args": ["-y", "<YOUR_NPM_PACKAGE_NAME>"]
+    }
+  }
+}
+```
+
+---
+
+### 3) Local (from source) 🧩
+
+Clone this repo and run directly.
+
+```bash
 git clone https://github.com/particlefuture/MCPDiscovery.git
 cd MCPDiscovery
 uv sync
-uv run server.py
-```
-Unfortunately, up to the time this md file is updated, claude only allows stdio. So you'd have to modify `server.py` to use STDIO. Find the main block in `server.py`, comment out the "Streamable HTTP server BLOCK" and uncomment the "Standard I/O server BLOCK". Final code should look like this
-```python
-    asyncio.run(
-        mcp.run_async(
-            transport="stdio",
-        )
-    )
+uv run server.py --local
 ```
 
-The mcp.json should look like this: 
 ```json
 {
-    "mcpServers": {
-        "mcp-servers-discovery": {
-            "command": "/Users/jiazhenghao/.local/bin/uv",
-            "args": [
-                "--directory",
-                "{PATH_TO_THE_CLONED_REPO (e.g. `/Users/ElonMusk/CodingProjects/MCP/1mcpserver`)}",
-                "run",
-                "server.py", 
-               "--local"
-            ]
-        },
-        "file-system": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "@modelcontextprotocol/server-filesystem",
-              "."
-            ]
-        }
+  "mcpServers": {
+    "1mcpserver": {
+      "command": "/path/to/uv",
+      "args": [
+        "--directory",
+        "<PATH_TO_CLONED_REPO>",
+        "run",
+        "server.py",
+        "--local"
+      ]
     }
+  }
 }
 ```
-**If you want to give LLM more file-system privilege, adjust, adjust the third argument to something like: 
+
+> If your client supports remote `url` servers, you can use the **Remote** setup instead.
+
+#### Optional: grant file-system access 📁
+
+If you want your LLM to have file-system access, add an MCP filesystem server and point it at the directory you want to allow:
+
 ```json
-        "file-system": {
-            "command": "npx",
-            "args": [
-              "-y",
-              "@modelcontextprotocol/server-filesystem",
-              "~/" // <- Home directory, or any directory you want to give privilege to
-            ]
+{
+  "mcpServers": {
+    "file-system": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "~/"]
+    }
+  }
+}
 ```
 
-## Architecture
-There are two types of search tools: quick search and a deep search. 
-### Quick Search
-When the user has an explicit goal of what type of MCP they want ("I want a MCP server that handles payment"), this tool just gives back a list of mcp servers.
-### Deep Search <sup>*</sup>
-When the user has a high level or complex description of the goal ("Build me a website that analyzes other websites"). The LLM need to break it down into multiple steps and components (I need to analyze the website traffic, I need to analyze the website tech stack, I need to show some web data, ...), then find MCP servers for each step. If a corresponding MCP server doesn't exist, inform the user to see if we should ignore this component, break it down further, or implement it ourselves. 
+---
 
-I refer to this as horizontal expansion and vertical expansion. Horizontal expansion is for finding independent components, vertical expansion is for finding steps that have to be done sequentially (more like fetch, analyze, generate graph). In the above example, those are all horizontal expansions.  
+## Architecture 🧠
 
+There are two search modes:
 
-There are multiple stages in the deep search:
-1. Planning stage: 
-    - setup mcp servers: 
-        - get and configure API keys as needed, provide users with instructions of obtaining API keys 
-        - modify the mcp.json files. 
-2. Testing stage:
-    - test to see if they servers are working. Call `test_server_template_code` tool, which return a simple client testing code example.  
-3. Acting stage: 
-    - build the workflow/application by calling the MCP servers
+### Quick Search ⚡
 
-*We're supposed to put deep search as a prompt, but both cursor and claude rarely calls prompts. 
+For explicit requests like: “I want an MCP server that handles payments.”
 
-### Database Pipeline
-1. Find the list of possible MCP servers by calling `get_all_sources`
-2. Parse through each line to find the github 
-3. Call `update_db` on the list of, which
-   1. 
+Returns a shortlist of relevant MCP servers.
 
-# Change Log:
-- July 31 2025: Upgrade to 0.2.0. Added agentic planning. For complex tasks, the server now prompts the LLM to perform multi-step MCP server query.
-- 
-### Future
-- improve the demo videos: new domain name, actual example, voice explanation
-- Call For MCCP (Model Context Communication Protocol): Standard way of communicating between MCP servers. Motivation: Allow directly sending requests to other mcp servers (each mcp server might also have dependencies). (But would also need stricter supervision)
-- shouldn't call functions with a leading prefix `internal_` unless instructed by MCP servers 
+### Deep Search 🌊
 
-- Better database for MCP servers. It should be in structure: server, description, url, config json, (optionally, additional setup, docker, api_key, etc)
+For higher-level or complex goals like: “Build a website that analyzes other websites.”
 
+The LLM breaks the goal into components/steps, finds MCP servers for each part, and if something is missing, it asks whether to:
 
-### This repo is based on these repos. Huge thanks to the author and contributors of these repos.
-Data source: 
-- wong2/awesome-mcp-servers
-- metorial/mcp-containers
-- punkpeye/awesome-mcp-servers
-- modelcontextprotocol/servers
+* ignore that part,
+* break it down further, or
+* implement it ourselves.
 
-Published to: 
-- https://mcpservers.org/
-- https://glama.ai/mcp/servers
-- 
+Deep Search stages:
 
-### More about the repo
-Motivation and Context: 
-> Right now, most MCP server search are done via github searching or online google search. There has been several MCP wrappers, but most serves as an middleware infrastructure that hosts different MCP at an endpoint. The gathering of which MCP to host is still mostly done by manual search. We provide an automatic pipeline of not only searching but also automatically configuring MCP servers.
+1. **Planning** — identify servers, keys, and config changes
+2. **Testing** — verify servers (via `test_server_template_code`)
+3. **Acting** — execute the workflow using the configured servers
 
-How Has This Been Tested?
-> Tested with Claude and Cursor with both remote endpoint and local stdio. Tested the demo for 10 times.
+---
 
-# Trouble shooting
-- If using venv, ModuleNotFoundError even after installing the module -> delete venv and create a new venv. 
+## Change Log 🕒
 
-["--directory", "./", "run", "server.py", "--local"]
+* July 31 2025: Upgrade to 0.2.0. Added agentic planning.
+* Dec 12 2025: Support for Gemini + Codex
+* Dec 13 2025: Easier local setup with docker, npm, and uvx. 
+
+## Future 🔮
+
+* Better demo videos (new domain, narrated walkthrough)
+* Model Context Communication Protocol (MCCP): standard server-to-server messaging
+* Avoid calling tools with an `internal_` prefix unless instructed
+* Improve MCP server database schema: server, description, url, config json, extra setup (docker/api key/etc)
+
+## Credits 🙏
+
+Data sources:
+
+* wong2/awesome-mcp-servers
+* metorial/mcp-containers
+* punkpeye/awesome-mcp-servers
+* modelcontextprotocol/servers
+
+Published to:
+
+* [https://mcpservers.org/](https://mcpservers.org/)
+* [https://glama.ai/mcp/servers](https://glama.ai/mcp/servers)
+
+## Troubleshooting 🧰
+
+* If using a venv and you get `ModuleNotFoundError` even after installing: delete the venv and recreate it.
