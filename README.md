@@ -10,13 +10,14 @@ The goal is that you only install **this** MCP server, and it handles the rest (
 
 ### Demo video 🎥: [https://youtu.be/W4EAmaTTb2A](https://youtu.be/W4EAmaTTb2A) 
 
+## Quick Setup
 Choose **one** of the following:
 
-1. **Remote** (fastest)
+1. **Remote** (simplest & fastest ⚡💨)
 2. **Local (prebuilt)** — **Docker**, **uvx**, or **npx**
 3. **Local (from source)** — run this repo directly
 
-### 1) Remote 🌍
+### 1) Remote 🌍⚡💨
 
 Use the hosted endpoint (recommended for the simplest setup).
 
@@ -29,10 +30,11 @@ Add the following entry to your client config file:
 * **Cursor**: `./.cursor/mcp.json`
 * **Gemini CLI**: `./gemini/settings.json` (see Gemini docs)
 * **Claude Desktop**:
-
   * macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
   * Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-* **Codex**: see Codex MCP configuration docs
+* **Codex**: 
+  * macOS: `~/.codex/config.toml`
+  * Windows: `%USERPROFILE%\.codex\config.toml`
 
 **Remote config (JSON):**
 
@@ -50,7 +52,7 @@ Add the following entry to your client config file:
 }
 ```
 
-If you already have other servers configured, just merge this entry under `mcpServers`:
+If you already have other servers configured, just merge this entry under `mcpServers` For example:
 
 ```json
 {
