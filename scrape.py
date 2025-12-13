@@ -1,5 +1,6 @@
 import time
 
+import github.Auth
 import requests
 import re
 import os
@@ -15,25 +16,14 @@ from langchain_community.vectorstores import FAISS
 
 from github import RateLimitExceededException
 
-# from server_list_sources import get_all_sources
+from server_list_sources import get_all_sources
+
 # ---------------------------------------------------------------------
 # If fetch_readme is in the same file, this import isn't needed.
 # If it's in another module, replace the direct call below accordingly.
 # from my_readme_fetcher import fetch_readme
 # ---------------------------------------------------------------------
-
-load_dotenv()
-GH_TOKEN = os.getenv("GITHUB_TOKEN")
-
-# Constants
-HEADER = {
-    "Authorization": f"Bearer {GH_TOKEN}",  # use “token” scheme for PAT
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/58.0.3029.110 Safari/537.3"
-    )
-}
+from config import *
 
 BASE_DIR = os.getenv("DATADIR", "db")
 
@@ -68,6 +58,8 @@ def create_db_and_table(db_path):
 
 
 def read_servers_from_txt(txt_path):
+    strict_regex = re.compile(r'^-\s*\[(?P<name>[^\]]+)\]\((?P<url>[^)]+)\)\s*-\s*(?P<desc>.+\S)\s*$') # match everything after second hyphen as description
+    fallback_regex = re.compile(r'^-\s*\[(?P<name>[^\]]+)\]\((?P<url>[^)]+)\)\s*(?P<desc>.+\S)\s*$') # if second hyphen isn't present, match everything after url
     servers = []
     if not os.path.exists(txt_path):
         return servers
@@ -76,7 +68,7 @@ def read_servers_from_txt(txt_path):
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-            match = re.match(r'-\s*\[([^\]]+)\]\(([^)]+)\)\s*-\s*(.+)', line)
+            match = strict_regex.match(line) or fallback_regex.match(line)
             if not match:
                 print(f"Skipping unrecognized line format: {line}")
                 continue
@@ -159,7 +151,7 @@ def fetch_readme(github_url: str) -> str:
             try:
                 from github import Github
                 token = os.getenv("GITHUB_TOKEN", None)
-                gh = Github(token) if token else Github()
+                gh = Github(auth=github.Auth.Token(token)) if token else Github()
                 repo = gh.get_repo(f"{owner}/{repo_name}")
                 if not use_branch:
                     use_branch = getattr(repo, "default_branch", None)
@@ -168,6 +160,9 @@ def fetch_readme(github_url: str) -> str:
                     resp = requests.get(raw_url, headers=HEADER, timeout=10)
                     if resp.status_code == 200:
                         raw_content = resp.text
+                    else:
+                        # log raw url failed
+                        print(f"Raw fetch failed for {raw_url} with status {resp.status_code}")
                 # Fallback: use GitHub API to get the README for that directory
                 if raw_content is None:
                     target_dir = subpath or ""
@@ -362,22 +357,22 @@ def generate_embeddings(db_path):
 # ---------------------------
 
 if __name__ == '__main__':
-    # # 1. Scrape and write to text file
-    # sources = get_all_sources()
-    # os.makedirs(os.path.dirname(TXT_PATH), exist_ok=True)
-    # with open(TXT_PATH, 'w', encoding='utf-8') as f:
-    #     f.write("\n".join(sources))
-    # print(f"Scraped {len(sources)} server entries to {TXT_PATH}")
+    # 1. Scrape and write to text file
+    sources = get_all_sources()
+    os.makedirs(os.path.dirname(TXT_PATH), exist_ok=True)
+    with open(TXT_PATH, 'w', encoding='utf-8') as f:
+        f.write("\n".join(sources))
+    print(f"Scraped {len(sources)} server entries to {TXT_PATH}")
 
-    # # 2. Initialize / migrate DB
-    # create_db_and_table(DB_PATH)
-    #
-    # # 3. Read scraped entries and update DB (with README + flags)
-    # servers = read_servers_from_txt(TXT_PATH)
-    # if servers:
-    #     update_db(DB_PATH, servers)
-    # else:
-    #     print(f"No valid servers found in {TXT_PATH}")
+    # 2. Initialize / migrate DB
+    create_db_and_table(DB_PATH)
+
+    # 3. Read scraped entries and update DB (with README + flags)
+    servers = read_servers_from_txt(TXT_PATH)
+    if servers:
+        update_db(DB_PATH, servers)
+    else:
+        print(f"No valid servers found in {TXT_PATH}")
 
     # 4. Generate and save embeddings (now includes README content)
     generate_embeddings(DB_PATH)
