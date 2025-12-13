@@ -59,9 +59,9 @@ def get_source3():
     return out
 
 def get_all_sources():
-    s1 = get_source1()[:2]
-    s2 = get_source2()[:2]
-    s3 = get_source3()[:2]
+    s1 = get_source1()
+    s2 = get_source2()
+    s3 = get_source3()
     return s1 + s2 + s3
 
 if __name__ == '__main__':

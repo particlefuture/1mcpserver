@@ -136,7 +136,8 @@ def fetch_readme(github_url: str) -> str:
         for br in candidate_branches:
             raw_url = f"https://raw.githubusercontent.com/{owner}/{repo_name}/{br}/{readme_path_fragment}"
             try:
-                resp = requests.get(raw_url, headers=HEADER, timeout=10)
+                # NO Header when visiting raw github! Only need header when visiting api.github.com
+                resp = requests.get(raw_url, timeout=10)
                 if resp.status_code == 200:
                     raw_content = resp.text
                     use_branch = br
