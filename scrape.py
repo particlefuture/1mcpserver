@@ -136,7 +136,7 @@ def fetch_readme(github_url: str) -> str:
         for br in candidate_branches:
             raw_url = f"https://raw.githubusercontent.com/{owner}/{repo_name}/{br}/{readme_path_fragment}"
             try:
-                # NO Header when visiting raw github! Only need header when visiting api.github.com
+                # NO Header when visiting raw github! Only need header when visiting api.github.com 
                 resp = requests.get(raw_url, timeout=10)
                 if resp.status_code == 200:
                     raw_content = resp.text
@@ -291,7 +291,7 @@ def update_db(db_path, servers):
             c.execute('''
                 INSERT INTO servers (name, description, url, readme_content, fetch_error, require_api_key)
                 VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT(url) DO DO NOTHING
+                ON CONFLICT(url) DO UPDATE SET
                     name = excluded.name,
                     description = excluded.description,
                     readme_content = excluded.readme_content,
