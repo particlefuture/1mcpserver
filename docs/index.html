@@ -22,6 +22,7 @@
                     <button class="tab-link active" data-tab="#cursor">Cursor</button>
                     <button class="tab-link" data-tab="#claude">Claude</button>
                     <button class="tab-link" data-tab="#gemini">Gemini CLI</button>
+                    <button class="tab-link" data-tab="#codex">Codex</button>
                 </div>
 
                 <div id="cursor" class="tab-content active">
@@ -49,18 +50,18 @@
                     </ul>
                     <p>Add the following code to the file: Note you HAVE TO CLONE REPO</p>
                     <pre><code>{
-                      "mcpServers": {
-                        "1mcpserver": {
-                          "command": "/path/to/uv",
-                          "args": [
-                            "--directory",
-                            "PATH_TO_CLONED_REPO",
-                            "run",
-                            "server.py",
-                            "--local"
-                          ]
-                        }
-                      }
+  "mcpServers": {
+    "1mcpserver": {
+      "command": "/path/to/uv",
+      "args": [
+        "--directory",
+        "PATH_TO_CLONED_REPO",
+        "run",
+        "server.py",
+        "--local"
+      ]
+    }
+  }
 }</code></pre>
                 </div>
 
@@ -78,6 +79,17 @@
     }
   }
 }</code></pre>
+                </div>
+
+                <div id="codex" class="tab-content">
+                    <h3>Codex</h3>
+                    <p>For Codex: Add the following code to <code>~/.codex/config.toml</code> (macOS) or <code>%USERPROFILE%\.codex\config.toml</code> (Windows).</p>
+                    <pre><code>[mcpServers.mcp-server-discovery]
+url = "https://mcp.1mcpserver.com/mcp/"
+
+[mcpServers.mcp-server-discovery.headers]
+Accept = "text/event-stream"
+Cache-Control = "no-cache"</code></pre>
                 </div>
             </div>
         </section>
