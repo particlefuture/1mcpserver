@@ -21,4 +21,4 @@ EXPOSE $PORT
 RUN echo "⏳  Building image with PORT=${PORT}"
 
 # Run the FastMCP server
-CMD ["uv", "run", "server.py"]
+ENTRYPOINT ["uv", "run", "server.py"]

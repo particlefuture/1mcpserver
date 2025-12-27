@@ -81,31 +81,23 @@ If you already have other servers configured, just merge this entry under `mcpSe
 Use this when you want everything local, or when your MCP client only supports **STDIO**.
 
 #### 2A) Docker 🐳
-
-> Use this if you want an isolated runtime and a single, reproducible command.
-
 ```bash
-docker run --rm -i \
-  -e DATADIR=/data \
-  -v "$PWD/db:/data" \
-  <YOUR_DOCKER_IMAGE_HERE>
+ docker run -p 8080:8080 ghcr.io/particlefuture/1mcpserver:latest
+```
+Running on other host ports: 
+```bash
+ docker run -p <FREE_HOST_PORT_NUM>:8080 ghcr.io/particlefuture/1mcpserver:latest
+```
+Running with stdio instead of streamable-http (You might see some delays when trying to connect): 
+```bash
+run --rm -i ghcr.io/particlefuture/1mcpserver:latest --local
 ```
 
 ```json
 {
   "mcpServers": {
     "1mcpserver": {
-      "command": "docker",
-      "args": [
-        "run",
-        "--rm",
-        "-i",
-        "-e",
-        "DATADIR=/data",
-        "-v",
-        "${PWD}/db:/data",
-        "<YOUR_DOCKER_IMAGE_HERE>"
-      ]
+      "url": "https://mcp.1mcpserver.com/mcp/"
     }
   }
 }
