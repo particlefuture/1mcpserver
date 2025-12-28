@@ -13,6 +13,23 @@ header {
     padding: 2rem 2rem; /* Reduced padding */
     background: linear-gradient(180deg, #1a1a1a, #0f0f0f); /* Subtle gradient */
     border-bottom: 1px solid #2a2a2a;
+    position: relative; /* For absolute positioning of github link */
+}
+
+.github-link {
+    position: absolute;
+    top: 2.5rem;
+    right: 3rem;
+    color: #a0a0a0;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.github-link:hover {
+    color: #ffffff;
+    transform: scale(1.1);
 }
 
 h1 {
