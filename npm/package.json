@@ -1,0 +1,11 @@
+{
+  "name": "@1mcpserver/1mcpserver",
+  "version": "0.1.2",
+  "description": "Run 1mcpserver locally via Docker",
+  "license": "Apache-2.0",
+  "private": false,
+  "bin": {
+    "1mcpserver": "./cli.js"
+  },
+  "files": ["cli.js", "package.json", "LICENSE"]
+}

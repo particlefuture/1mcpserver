@@ -103,31 +103,9 @@ run --rm -i ghcr.io/particlefuture/1mcpserver:latest --local
 }
 ```
 
-#### 2B) uvx 🐍
-
-> Use this if you publish the server as a Python package and want a one-liner.
-
+#### 2B) npx 📦
 ```bash
-uvx <YOUR_PACKAGE_NAME> --local
-```
-
-```json
-{
-  "mcpServers": {
-    "1mcpserver": {
-      "command": "uvx",
-      "args": ["<YOUR_PACKAGE_NAME>", "--local"]
-    }
-  }
-}
-```
-
-#### 2C) npx 📦
-
-> Use this if you publish a Node wrapper / launcher and want a one-liner.
-
-```bash
-npx -y <YOUR_NPM_PACKAGE_NAME>
+npx -y @1mcpserver/1mcpserver
 ```
 
 ```json
