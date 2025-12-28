@@ -215,3 +215,8 @@ Published to:
 ## Troubleshooting 🧰
 
 * If using a venv and you get `ModuleNotFoundError` even after installing: delete the venv and recreate it.
+
+Please create an issue or directly contact me zjia71@gatech.edu if you encounter ANY issue of frustration. I really hope the setup is as smooth as possible!!
+
+## Star History
+[![Star History Chart](https://api.star-history.com/svg?repos=particlefuture/1mcpserver&type=Date)](https://star-history.com/#particlefuture/1mcpserver&Date)
