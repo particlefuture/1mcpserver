@@ -157,10 +157,22 @@ pre {
 }
 
 code {
-    font-family: 'Menlo', 'Monaco', 'Courier New', monospace; /* Better monospace stack */
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    color: #e2e8f0;
+    background-color: #333333;
+    padding: 0.2em 0.4em;
+    border-radius: 6px;
+    font-size: 0.95em;
+    border: 1px solid #444;
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    border-radius: 0;
     color: #d4d4d4;
-    font-size: 1rem; /* Increased font size */
-    line-height: 1.5;
+    font-size: 1rem;
 }
 
 #demo iframe {
