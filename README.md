@@ -108,17 +108,6 @@ run --rm -i ghcr.io/particlefuture/1mcpserver:latest --local
 npx -y @1mcpserver/1mcpserver
 ```
 
-```json
-{
-  "mcpServers": {
-    "1mcpserver": {
-      "command": "npx",
-      "args": ["-y", "<YOUR_NPM_PACKAGE_NAME>"]
-    }
-  }
-}
-```
-
 ---
 
 ### 3) Local (from source) 🧩
@@ -200,7 +189,7 @@ Deep Search stages:
 
 * July 31 2025: Upgrade to 0.2.0. Added agentic planning.
 * Dec 12 2025: Support for Gemini + Codex
-* Dec 13 2025: Easier local setup with docker, npm, and uvx. 
+* Dec 13 2025: Easier local setup with docker and npm. 
 
 ## Future 🔮
 
