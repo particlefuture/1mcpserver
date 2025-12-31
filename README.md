@@ -1,5 +1,7 @@
 # [1 MCP Server](https://mcp.1mcpserver.com/) 🚀
 
+[![Website](https://img.shields.io/badge/Website-mcp.1mcpserver.com-blue?style=flat-square&logo=google-chrome)](https://mcp.1mcpserver.com/)
+
 > **MCP of MCPs** — automatically discover and configure MCP servers on your machine (remote or local).
 
 After setup, you can usually just say:
