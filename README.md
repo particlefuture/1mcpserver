@@ -1,4 +1,4 @@
-# 1 MCP Server 🚀
+# [1 MCP Server](https://mcp.1mcpserver.com/) 🚀
 
 > **MCP of MCPs** — automatically discover and configure MCP servers on your machine (remote or local).
 
