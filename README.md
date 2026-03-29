@@ -222,3 +222,8 @@ Please create an issue or directly contact me zjia71@gatech.edu if you encounter
 
 ## Star History
 [![Star History Chart](https://api.star-history.com/svg?repos=particlefuture/1mcpserver&type=Date)](https://star-history.com/#particlefuture/1mcpserver&Date)
+
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/particlefuture-mcpdiscovery).
+
